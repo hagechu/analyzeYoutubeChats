@@ -1,11 +1,9 @@
-import "./App.css";
-import { GetTwitchData } from "./components/GetTwitchData";
+import { GetYoutubeChats } from "./components/GetYoutubeChats";
 
 const App = () => {
   return (
     <div className="App">
-      <p>a</p>
-      <GetTwitchData />
+      <GetYoutubeChats />
     </div>
   );
 };
