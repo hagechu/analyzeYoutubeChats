@@ -10,6 +10,7 @@ export const GetYoutubeChats = () => {
   const [chats, setChats] = useState<Array<Chat>>([]); // チャットの全データを格納
   const [videoID, setVideoID] = useState(""); // サーバーに送る動画のID
   const [isLoading, setIsLoading] = useState(false); // リクエスト中の判別
+  const [isTesting, setIsTesting] = useState(false); // test中の判別
 
   const [flowRatePerMinutes, setFlowRatePerMinutes] = useState<ChatPerMinute[]>(
     []
@@ -33,20 +34,56 @@ export const GetYoutubeChats = () => {
     if (!(target instanceof HTMLInputElement)) {
       return;
     }
-    setVideoID(
-      target.value.slice(target.value.length - 11, target.value.length)
-    );
+
+    if (target.value.length > 11) {
+      setVideoID(
+        target.value.slice(
+          target.value.indexOf("=") + 1,
+          target.value.indexOf("=") + 12
+        )
+      );
+    } else {
+      setVideoID(target.value);
+    }
   };
 
   //サーバーにポスト
   const postServer = () => {
     setIsLoading(true);
-    axios
-      .post("http://127.0.0.1:5000/getYoutubeChats", { videoID: videoID })
-      .then((response) => {
-        setChats(response.data.chats);
-        setIsLoading(false);
-      });
+    if (isTesting) {
+      axios
+        .post("http://127.0.0.1:5000/getYoutubeChatsTest", { videoID: videoID })
+        .then((response) => {
+          setChats(response.data.chats);
+          setIsLoading(false);
+        });
+    } else if (videoID === "test") {
+      setIsTesting(true);
+      setVideoID("");
+      setIsLoading(false);
+    } else {
+      axios
+        .post("http://127.0.0.1:5000/getYoutubeChats", { videoID: videoID })
+        .then((response) => {
+          setChats(response.data.chats);
+          setIsLoading(false);
+        });
+    }
+  };
+
+  // 年と日付を表記するかの判別
+  const omitDate = (date: string, index: number, data: ChatPerMinute[]) => {
+    if (index === 0) {
+      return date;
+    } else if (date.slice(11, 16) === data[0].date.slice(11, 16)) {
+      return date;
+    } else if (date.slice(0, 4) !== data[0].date.slice(0, 4)) {
+      return date;
+    } else if (date.slice(0, 10) !== data[0].date.slice(0, 10)) {
+      return date.slice(5, 16);
+    } else {
+      return date.slice(11, 16);
+    }
   };
 
   // １分おきのデータを作成
@@ -56,49 +93,28 @@ export const GetYoutubeChats = () => {
       //初回マウントなにもしない
     } else {
       chats.forEach((chat, index) => {
-        const dateMinute = chat.date.substr(0, 16);
-
-        // 年と日付を表記するかの判別
-        const omitDate = (date: string) => {
-          if (index === 0) {
-            return date;
-          } else if (
-            date.substr(11, 5) === chatPerMinutes[0].name.substr(11, 5)
-          ) {
-            return date;
-          } else if (
-            date.substr(0, 4) !== chatPerMinutes[0].name.substr(0, 4)
-          ) {
-            return date;
-          } else if (
-            date.substr(0, 10) !== chatPerMinutes[0].name.substr(0, 10)
-          ) {
-            return date.substr(5, 11);
-          } else {
-            return date.substr(11, 5);
-          }
-        };
+        const dateMinute = chat.date.slice(0, 16);
 
         // データの作成
         if (index === 0) {
           chatPerMinutes.push({
-            name: omitDate(dateMinute),
+            date: omitDate(dateMinute, index, chatPerMinutes),
             chatAmount: 1,
             wordAmount: 0,
           });
         } else if (
-          chatPerMinutes[chatPerMinutes.length - 1].name !==
-          omitDate(dateMinute)
+          chatPerMinutes[chatPerMinutes.length - 1].date !==
+          omitDate(dateMinute, index, chatPerMinutes)
         ) {
           if (
             chatPerMinutes.length > 1 &&
-            omitDate(dateMinute) ===
-              chatPerMinutes[chatPerMinutes.length - 2].name
+            omitDate(dateMinute, index, chatPerMinutes) ===
+              chatPerMinutes[chatPerMinutes.length - 2].date
           ) {
             chatPerMinutes[chatPerMinutes.length - 1].chatAmount += 1;
           } else {
             chatPerMinutes.push({
-              name: omitDate(dateMinute),
+              date: omitDate(dateMinute, index, chatPerMinutes),
               chatAmount: 1,
               wordAmount: 0,
             });
@@ -123,18 +139,18 @@ export const GetYoutubeChats = () => {
       flowRatePerMinutes.forEach((chat, index) => {
         if (index % 10 === 0) {
           chatPer5Minutes.push({
-            name: chat.name,
+            date: chat.date,
             chatAmount: 0 + chat.chatAmount,
             wordAmount: 0,
           });
           chatPer10Minutes.push({
-            name: chat.name,
+            date: chat.date,
             chatAmount: 0 + chat.chatAmount,
             wordAmount: 0,
           });
         } else if (index % 5 === 0) {
           chatPer5Minutes.push({
-            name: chat.name,
+            date: chat.date,
             chatAmount: 0 + chat.chatAmount,
             wordAmount: 0,
           });
@@ -166,10 +182,18 @@ export const GetYoutubeChats = () => {
 
   const searchData = () => {
     const chatArray = [...flowRatePerMinutes];
-    const dateArray = flowRatePerMinutes.map((data) => data.name);
-    chats.forEach((chat) => {
+    const dateArray = flowRatePerMinutes.map((data) => data.date);
+
+    chatArray.forEach((chat) => {
+      chat.wordAmount = 0;
+    });
+
+    chats.forEach((chat, index) => {
+      const dateMinute = chat.date.slice(0, 16);
       if (chat.message.match(searchWord)) {
-        chatArray[dateArray.indexOf(chat.date.substr(11, 5))].wordAmount += 1;
+        chatArray[
+          dateArray.indexOf(omitDate(dateMinute, index, chatArray))
+        ].wordAmount += 1;
       }
     });
 
@@ -177,27 +201,33 @@ export const GetYoutubeChats = () => {
     setGraphData(chatArray);
   };
 
+  console.log(chats);
+
   return (
     <div>
       <div>
         <input value={videoID} onChange={generateVideoIDFromInput} />
         <button onClick={postServer}>getChats</button>
       </div>
+      <div>{isTesting ? <p>testMode</p> : <p></p>}</div>
       <div>{isLoading ? <p>分析中...</p> : <p>待機中</p>}</div>
-      <div>
+      {/* <div>
         <p>testURL : https://www.youtube.com/watch?v=HFi7I-Z-86E</p>
         <p>testURL : https://www.youtube.com/watch?v=dj2xt5wSA7A</p>
-        <p>testURL : https://www.youtube.com/watch?v=VH5z21x7_3c</p>
-      </div>
+        <p>testURL : https://www.youtube.com/watch?v=v-vQpGo70A8</p>
+        <p>testURL : https://www.youtube.com/watch?v=iMfSSZ_Utc0</p>
+      </div> */}
       <div>
         <Graph graphData={graphData} dataKey="chatAmount" />
         {/* <button onClick={() => setChats(testData)}>test</button> */}
-        <button onClick={() => setGraphData(flowRatePerMinutes)}>1分</button>
-        <button onClick={() => setGraphData(flowRatePer5Minutes)}>5分</button>
-        <button onClick={() => setGraphData(flowRatePer10Minutes)}>10分</button>
       </div>
       <div>
         <Graph graphData={graphData} dataKey="wordAmount" />
+      </div>
+      <div>
+        <button onClick={() => setGraphData(flowRatePerMinutes)}>1分</button>
+        <button onClick={() => setGraphData(flowRatePer5Minutes)}>5分</button>
+        <button onClick={() => setGraphData(flowRatePer10Minutes)}>10分</button>
         <input value={searchWord} onChange={inputWord} />
         <button onClick={searchData}>検索してグラフに描画</button>
       </div>
@@ -209,4 +239,5 @@ export const GetYoutubeChats = () => {
 
 // https://www.youtube.com/watch?v=HFi7I-Z-86E
 // https://www.youtube.com/watch?v=dj2xt5wSA7A
-// https://www.youtube.com/watch?v=VH5z21x7_3c
+// https://www.youtube.com/watch?v=v-vQpGo70A8
+// https://www.youtube.com/watch?v=iMfSSZ_Utc0

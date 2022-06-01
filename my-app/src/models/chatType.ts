@@ -1,5 +1,5 @@
 export type ChatPerMinute = {
-  name: string;
+  date: string;
   chatAmount: number;
   wordAmount: number;
 };
