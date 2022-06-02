@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import styled from "styled-components";
 
 import { Graph } from "./Graph";
-// import { testData } from "./testData";
+import { Icon } from "./Icon";
+import { CutPerMinutesButton } from "./CutPerMinutesButton";
+import { PlayYoutubeVideo } from "./PlayYoutubeVideo";
 
 import { ChatPerMinute, Chat } from "../models/chatType";
 
 export const GetYoutubeChats = () => {
   const [chats, setChats] = useState<Array<Chat>>([]); // チャットの全データを格納
   const [videoID, setVideoID] = useState(""); // サーバーに送る動画のID
+  const [videoIDforPlay, setVideoIDforPlay] = useState("HFi7I-Z-86E"); // サーバーに送る動画のID
+
   const [isLoading, setIsLoading] = useState(false); // リクエスト中の判別
   const [isTesting, setIsTesting] = useState(false); // test中の判別
+  const [showingVideo, setShowingVideo] = useState(false); // 動画を表示するかの判別
 
   const [flowRatePerMinutes, setFlowRatePerMinutes] = useState<ChatPerMinute[]>(
     []
@@ -47,26 +53,35 @@ export const GetYoutubeChats = () => {
     }
   };
 
-  //サーバーにポスト
+  //サーバーにポスト & 帰ってきたタイミングでそれぞれsetState
   const postServer = () => {
     setIsLoading(true);
+    setShowingVideo(false);
+
     if (isTesting) {
+      // testMode中の処理
       axios
         .post("http://127.0.0.1:5000/getYoutubeChatsTest", { videoID: videoID })
         .then((response) => {
           setChats(response.data.chats);
           setIsLoading(false);
+          setVideoIDforPlay(videoID);
+          setShowingVideo(true);
         });
     } else if (videoID === "test") {
+      // testModeコマンド
       setIsTesting(true);
       setVideoID("");
       setIsLoading(false);
     } else {
+      // 普段の処理
       axios
         .post("http://127.0.0.1:5000/getYoutubeChats", { videoID: videoID })
         .then((response) => {
           setChats(response.data.chats);
           setIsLoading(false);
+          setVideoIDforPlay(videoID);
+          setShowingVideo(true);
         });
     }
   };
@@ -171,7 +186,7 @@ export const GetYoutubeChats = () => {
     setFlowRatePer10Minutes(chatPer10Minutes);
   }, [flowRatePerMinutes]);
 
-  //
+  // 検索ワードの入力の判別
   const inputWord = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { target } = event;
     if (!(target instanceof HTMLInputElement)) {
@@ -180,6 +195,7 @@ export const GetYoutubeChats = () => {
     setSearchWord(target.value);
   };
 
+  // 入力されたワードで検索
   const searchData = () => {
     const chatArray = [...flowRatePerMinutes];
     const dateArray = flowRatePerMinutes.map((data) => data.date);
@@ -201,43 +217,141 @@ export const GetYoutubeChats = () => {
     setGraphData(chatArray);
   };
 
-  console.log(chats);
-
+  // りたーん
   return (
-    <div>
-      <div>
-        <input value={videoID} onChange={generateVideoIDFromInput} />
-        <button onClick={postServer}>getChats</button>
-      </div>
-      <div>{isTesting ? <p>testMode</p> : <p></p>}</div>
-      <div>{isLoading ? <p>分析中...</p> : <p>待機中</p>}</div>
-      {/* <div>
-        <p>testURL : https://www.youtube.com/watch?v=HFi7I-Z-86E</p>
-        <p>testURL : https://www.youtube.com/watch?v=dj2xt5wSA7A</p>
-        <p>testURL : https://www.youtube.com/watch?v=v-vQpGo70A8</p>
-        <p>testURL : https://www.youtube.com/watch?v=iMfSSZ_Utc0</p>
-      </div> */}
-      <div>
+    <Body>
+      <Header>
+        <InputURLBox
+          placeholder="videoID"
+          value={videoID}
+          onChange={generateVideoIDFromInput}
+        />
+        <PostButton onClick={postServer}>
+          <Icon iconName="vertical_align_bottom" iconSize={16} />
+        </PostButton>
+      </Header>
+      <Main>
+        <div>{isTesting ? <p>testMode</p> : <p></p>}</div>
+        <div>{isLoading ? <p>分析中...</p> : <p>待機中</p>}</div>
+        {showingVideo ? (
+          <PlayYoutubeVideo videoID={videoIDforPlay} />
+        ) : (
+          <div></div>
+        )}
         <Graph graphData={graphData} dataKey="chatAmount" />
-        {/* <button onClick={() => setChats(testData)}>test</button> */}
-      </div>
-      <div>
         <Graph graphData={graphData} dataKey="wordAmount" />
-      </div>
-      <div>
-        <button onClick={() => setGraphData(flowRatePerMinutes)}>1分</button>
-        <button onClick={() => setGraphData(flowRatePer5Minutes)}>5分</button>
-        <button onClick={() => setGraphData(flowRatePer10Minutes)}>10分</button>
-        <input value={searchWord} onChange={inputWord} />
-        <button onClick={searchData}>検索してグラフに描画</button>
-      </div>
-    </div>
+        <ControllerWrapper>
+          <ControllerWrapperRight>
+            <InputWordBox
+              placeholder="ワード検索"
+              value={searchWord}
+              onChange={inputWord}
+            />
+            <SearchButton onClick={searchData}>
+              <Icon iconName="search" iconSize={16} />
+            </SearchButton>
+          </ControllerWrapperRight>
+          <ControllerWrapperLeft>
+            <CutPerMinutesButton
+              buttonFunc={() => setGraphData(flowRatePerMinutes)}
+              buttonName="1分"
+              buttonSize={16}
+            />
+            <CutPerMinutesButton
+              buttonFunc={() => setGraphData(flowRatePer5Minutes)}
+              buttonName="5分"
+              buttonSize={16}
+            />
+            <CutPerMinutesButton
+              buttonFunc={() => setGraphData(flowRatePer10Minutes)}
+              buttonName="10分"
+              buttonSize={16}
+            />
+          </ControllerWrapperLeft>
+        </ControllerWrapper>
+      </Main>
+    </Body>
   );
 };
+
+//style
+const Body = styled.div`
+  height: 100vh;
+  background: #fafafa;
+`;
+
+const Header = styled.div`
+  height: 64px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #fff;
+`;
+
+const Main = styled.div`
+  margin: 0 auto;
+  padding: 0 200px;
+`;
+
+const InputURLBox = styled.input`
+  font-size: 16px;
+  width: 100%;
+  max-width: 400px;
+  line-height: 24px;
+  padding: 8px 16px;
+  border: solid 1px #ddd;
+  border-radius: 2px 0 0 2px;
+`;
+
+const PostButton = styled.button`
+  font-size: 16px;
+  line-height: 24px;
+  padding: 8px 16px;
+  border: solid 1px #ddd;
+  background-color: #eee;
+  border-radius: 0 2px 2px 0;
+`;
+
+const InputWordBox = styled.input`
+  font-size: 16px;
+  max-width: 200px;
+  line-height: 24px;
+  padding: 8px 16px;
+  border: solid 1px #ddd;
+  border-radius: 2px 0 0 2px;
+`;
+
+const SearchButton = styled.button`
+  font-size: 16px;
+  line-height: 24px;
+  padding: 8px 16px;
+  border: solid 1px #ddd;
+  background-color: #eee;
+  border-radius: 0 2px 2px 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ControllerWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const ControllerWrapperRight = styled.div`
+  display: flex;
+`;
+
+const ControllerWrapperLeft = styled.div`
+  display: flex;
+`;
 
 // http://localhost:3000/
 
 // https://www.youtube.com/watch?v=HFi7I-Z-86E
 // https://www.youtube.com/watch?v=dj2xt5wSA7A
 // https://www.youtube.com/watch?v=v-vQpGo70A8
+// https://www.youtube.com/watch?v=vIlEoMschL4&t=12s
 // https://www.youtube.com/watch?v=iMfSSZ_Utc0
