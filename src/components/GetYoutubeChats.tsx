@@ -6,6 +6,7 @@ import { Graph } from "./Graph";
 import { Icon } from "./Icon";
 import { CutPerMinutesButton } from "./CutPerMinutesButton";
 import { PlayYoutubeVideo } from "./PlayYoutubeVideo";
+import { InputForm } from "./InputForm";
 
 import { ChatPerMinute, Chat } from "../models/chatType";
 
@@ -16,7 +17,7 @@ export const GetYoutubeChats = () => {
 
   const [isLoading, setIsLoading] = useState(false); // リクエスト中の判別
   const [isTesting, setIsTesting] = useState(false); // test中の判別
-  const [showingVideo, setShowingVideo] = useState(false); // 動画を表示するかの判別
+  const [isShowingVideo, setIsShowingVideo] = useState(false); // 動画を表示するかの判別
 
   const [flowRatePerMinutes, setFlowRatePerMinutes] = useState<ChatPerMinute[]>(
     []
@@ -28,9 +29,9 @@ export const GetYoutubeChats = () => {
     ChatPerMinute[]
   >([]); // １０分おきのデータ
 
-  const [searchWord, setSearchWord] = useState("");
-
+  const [searchWord, setSearchWord] = useState(""); //グラフ内で検索するワード
   const [graphData, setGraphData] = useState<ChatPerMinute[]>([]); // グラフに描画するデータ
+  const [startTime, setStartTime] = React.useState<number>(0); //グラフから動画を再生する時間を指定
 
   // URLからIDだけにする
   const generateVideoIDFromInput = (
@@ -56,7 +57,7 @@ export const GetYoutubeChats = () => {
   //サーバーにポスト & 帰ってきたタイミングでそれぞれsetState
   const postServer = () => {
     setIsLoading(true);
-    setShowingVideo(false);
+    setIsShowingVideo(false);
 
     if (isTesting) {
       // testMode中の処理
@@ -66,7 +67,7 @@ export const GetYoutubeChats = () => {
           setChats(response.data.chats);
           setIsLoading(false);
           setVideoIDforPlay(videoID);
-          setShowingVideo(true);
+          setIsShowingVideo(true);
         });
     } else if (videoID === "test") {
       // testModeコマンド
@@ -81,7 +82,7 @@ export const GetYoutubeChats = () => {
           setChats(response.data.chats);
           setIsLoading(false);
           setVideoIDforPlay(videoID);
-          setShowingVideo(true);
+          setIsShowingVideo(true);
         });
     }
   };
@@ -104,7 +105,7 @@ export const GetYoutubeChats = () => {
   // １分おきのデータを作成
   useEffect(() => {
     const chatPerMinutes: ChatPerMinute[] = [];
-    if (chats === undefined) {
+    if (chats === []) {
       //初回マウントなにもしない
     } else {
       chats.forEach((chat, index) => {
@@ -221,35 +222,56 @@ export const GetYoutubeChats = () => {
   return (
     <Body>
       <Header>
-        <InputURLBox
-          placeholder="videoID"
+        <MenuIcon>
+          <Icon
+            iconName="Menu"
+            iconColor="#000"
+            iconSize={32}
+            iconWeight={300}
+          />
+          <div>{isTesting ? <p>testMode</p> : <p></p>}</div>
+        </MenuIcon>
+        <InputForm
+          placeholder={"videoID"}
+          iconName={"vertical_align_bottom"}
           value={videoID}
-          onChange={generateVideoIDFromInput}
+          boxMaxWidth={480}
+          boxFunc={generateVideoIDFromInput}
+          buttonFunc={postServer}
         />
-        <PostButton onClick={postServer}>
-          <Icon iconName="vertical_align_bottom" iconSize={16} />
-        </PostButton>
+        <HeaderRight></HeaderRight>
       </Header>
       <Main>
-        <div>{isTesting ? <p>testMode</p> : <p></p>}</div>
         <div>{isLoading ? <p>分析中...</p> : <p>待機中</p>}</div>
-        {showingVideo ? (
-          <PlayYoutubeVideo videoID={videoIDforPlay} />
-        ) : (
-          <div></div>
-        )}
-        <Graph graphData={graphData} dataKey="chatAmount" />
-        <Graph graphData={graphData} dataKey="wordAmount" />
+        <VideoSpace>
+          {isShowingVideo ? (
+            <PlayYoutubeVideo videoID={videoIDforPlay} startTime={startTime} />
+          ) : (
+            <TemporaryVideoSpace></TemporaryVideoSpace>
+          )}
+        </VideoSpace>
+        <Graph
+          graphData={graphData}
+          dataKey="chatAmount"
+          startTime={startTime}
+          setStartTime={setStartTime}
+        />
+        <Graph
+          graphData={graphData}
+          dataKey="wordAmount"
+          startTime={startTime}
+          setStartTime={setStartTime}
+        />
         <ControllerWrapper>
           <ControllerWrapperRight>
-            <InputWordBox
-              placeholder="ワード検索"
+            <InputForm
+              placeholder={"ワード検索"}
+              iconName={"search"}
               value={searchWord}
-              onChange={inputWord}
+              boxMaxWidth={240}
+              boxFunc={inputWord}
+              buttonFunc={searchData}
             />
-            <SearchButton onClick={searchData}>
-              <Icon iconName="search" iconSize={16} />
-            </SearchButton>
           </ControllerWrapperRight>
           <ControllerWrapperLeft>
             <CutPerMinutesButton
@@ -283,56 +305,47 @@ const Body = styled.div`
 const Header = styled.div`
   height: 64px;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 
   background: #fff;
 `;
 
+const MenuIcon = styled.button`
+  width: 72px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const HeaderRight = styled.div`
+  width: 72px;
+`;
+
 const Main = styled.div`
   margin: 0 auto;
-  padding: 0 200px;
+  max-width: 1000px;
+
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
 `;
 
-const InputURLBox = styled.input`
-  font-size: 16px;
+const VideoSpace = styled.div`
   width: 100%;
-  max-width: 400px;
-  line-height: 24px;
-  padding: 8px 16px;
-  border: solid 1px #ddd;
-  border-radius: 2px 0 0 2px;
-`;
-
-const PostButton = styled.button`
-  font-size: 16px;
-  line-height: 24px;
-  padding: 8px 16px;
-  border: solid 1px #ddd;
-  background-color: #eee;
-  border-radius: 0 2px 2px 0;
-`;
-
-const InputWordBox = styled.input`
-  font-size: 16px;
-  max-width: 200px;
-  line-height: 24px;
-  padding: 8px 16px;
-  border: solid 1px #ddd;
-  border-radius: 2px 0 0 2px;
-`;
-
-const SearchButton = styled.button`
-  font-size: 16px;
-  line-height: 24px;
-  padding: 8px 16px;
-  border: solid 1px #ddd;
-  background-color: #eee;
-  border-radius: 0 2px 2px 0;
+  height: 400px;
 
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const TemporaryVideoSpace = styled.div`
+  width: 100%;
+  max-width: 640px;
+  border: 2px dotted #ccc;
+
+  aspect-ratio: 16 / 9;
 `;
 
 const ControllerWrapper = styled.div`
@@ -345,7 +358,10 @@ const ControllerWrapperRight = styled.div`
 `;
 
 const ControllerWrapperLeft = styled.div`
+  width: 240px;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 // http://localhost:3000/

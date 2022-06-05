@@ -14,7 +14,12 @@ export const CutPerMinutesButton = (props: cutButtonProps) => {
 
   return (
     <CutButton onClick={buttonFunc} size={buttonSize}>
-      <Icon iconName="content_cut" iconSize={16} />
+      <Icon
+        iconName="content_cut"
+        iconColor="#000"
+        iconSize={16}
+        iconWeight={400}
+      />
       <ButtonName>{buttonName}</ButtonName>
     </CutButton>
   );
@@ -22,7 +27,7 @@ export const CutPerMinutesButton = (props: cutButtonProps) => {
 
 const CutButton = styled.button<{ size: number }>`
   font-size: ${(props) => `${props.size}px`};
-  padding: 8px 16px;
+  height: 32px;
 
   display: flex;
   justify-content: center;
@@ -30,5 +35,5 @@ const CutButton = styled.button<{ size: number }>`
 `;
 
 const ButtonName = styled.p`
-  width: 40px;
+  margin-left: 8px;
 `;
