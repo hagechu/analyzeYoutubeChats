@@ -63,7 +63,7 @@ export const Graph = (props: GraphProps) => {
   );
 };
 
-const GraphWrapper = styled.div`
+const GraphWrapper = styled.section`
   width: 100%;
 
   display: flex;

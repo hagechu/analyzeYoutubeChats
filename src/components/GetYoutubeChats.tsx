@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 import { Graph } from "./Graph";
 import { Icon } from "./Icon";
+import { SideMenu } from "./SideMenu";
 import { CutPerMinutesButton } from "./CutPerMinutesButton";
 import { PlayYoutubeVideo } from "./PlayYoutubeVideo";
 import { InputForm } from "./InputForm";
@@ -18,6 +19,7 @@ export const GetYoutubeChats = () => {
   const [isLoading, setIsLoading] = useState(false); // リクエスト中の判別
   const [isTesting, setIsTesting] = useState(false); // test中の判別
   const [isShowingVideo, setIsShowingVideo] = useState(false); // 動画を表示するかの判別
+  const [isShowingMenu, setIsShowingMenu] = useState(false); // サイドメニューの表示判別
 
   const [flowRatePerMinutes, setFlowRatePerMinutes] = useState<ChatPerMinute[]>(
     []
@@ -222,15 +224,23 @@ export const GetYoutubeChats = () => {
   return (
     <Body>
       <Header>
-        <MenuIcon>
-          <Icon
-            iconName="Menu"
-            iconColor="#000"
-            iconSize={32}
-            iconWeight={300}
-          />
+        <SideMenu
+          isShowingMenu={isShowingMenu}
+          setIsShowingMenu={setIsShowingMenu}
+        />
+        <HeaderLeft>
+          <IconSpace>
+            <MenuIcon onClick={() => setIsShowingMenu(true)}>
+              <Icon
+                iconName="Menu"
+                iconColor="#000"
+                iconSize={32}
+                iconWeight={300}
+              />
+            </MenuIcon>
+          </IconSpace>
           <div>{isTesting ? <p>testMode</p> : <p></p>}</div>
-        </MenuIcon>
+        </HeaderLeft>
         <InputForm
           placeholder={"videoID"}
           iconName={"vertical_align_bottom"}
@@ -241,7 +251,7 @@ export const GetYoutubeChats = () => {
         />
         <HeaderRight></HeaderRight>
       </Header>
-      <Main>
+      <Article>
         <div>{isLoading ? <p>分析中...</p> : <p>待機中</p>}</div>
         <VideoSpace>
           {isShowingVideo ? (
@@ -291,13 +301,14 @@ export const GetYoutubeChats = () => {
             />
           </ControllerWrapperLeft>
         </ControllerWrapper>
-      </Main>
+      </Article>
     </Body>
   );
 };
 
 //style
 const Body = styled.div`
+  position: relative;
   height: 100vh;
   background: #fafafa;
 `;
@@ -309,29 +320,42 @@ const Header = styled.div`
   align-items: center;
 
   background: #fff;
+  box-shadow: 0px 0px 1px 0.2px #ddd;
 `;
 
-const MenuIcon = styled.button`
+const HeaderLeft = styled.div`
+  width: 144px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const IconSpace = styled.div`
   width: 72px;
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
-const HeaderRight = styled.div`
-  width: 72px;
+const MenuIcon = styled.button`
+  width: 24px;
 `;
 
-const Main = styled.div`
+const HeaderRight = styled.div`
+  width: 144px;
+`;
+
+const Article = styled.article`
   margin: 0 auto;
   max-width: 1000px;
+  z-index: 10;
 
   display: flex;
   flex-flow: column;
   justify-content: center;
 `;
 
-const VideoSpace = styled.div`
+const VideoSpace = styled.section`
   width: 100%;
   height: 400px;
 
@@ -348,7 +372,7 @@ const TemporaryVideoSpace = styled.div`
   aspect-ratio: 16 / 9;
 `;
 
-const ControllerWrapper = styled.div`
+const ControllerWrapper = styled.section`
   display: flex;
   justify-content: space-between;
 `;

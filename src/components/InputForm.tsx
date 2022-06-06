@@ -49,7 +49,7 @@ const InputBox = styled.input<{ size: number }>`
   padding: 8px 16px;
   border: solid 1px #ddd;
   border-radius: 2px 0 0 2px;
-  box-shadow: 0px 0px 2px 0.5px #ddd inset;
+  box-shadow: 0px 0px 1px 0.2px #ddd inset;
 `;
 
 const Button = styled.button`
@@ -65,4 +65,9 @@ const Button = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  &:hover {
+    background: #e8e8e8;
+    box-shadow: 0px 0px 1px 0.2px #ddd;
+  }
 `;
