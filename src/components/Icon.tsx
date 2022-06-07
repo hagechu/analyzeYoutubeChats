@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-export type iconProps = {
+type iconProps = {
   iconName: string;
   iconColor: string;
   iconSize: number;

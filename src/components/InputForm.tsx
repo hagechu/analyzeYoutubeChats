@@ -2,19 +2,28 @@ import React from "react";
 import styled from "styled-components";
 
 import { Icon } from "./Icon";
+import { ButtonTooltip } from "./ButtonTooltip";
 
-type inputWrapperProps = {
+type InputWrapperProps = {
   placeholder: string;
   value: string;
   iconName: string;
+  tooltipContents: string;
   boxMaxWidth: number;
   boxFunc: (event: React.ChangeEvent<HTMLInputElement>) => void;
   buttonFunc: () => void;
 };
 
-export const InputForm = (props: inputWrapperProps) => {
-  const { placeholder, value, iconName, boxMaxWidth, boxFunc, buttonFunc } =
-    props;
+export const InputForm = (props: InputWrapperProps) => {
+  const {
+    placeholder,
+    value,
+    iconName,
+    tooltipContents,
+    boxMaxWidth,
+    boxFunc,
+    buttonFunc,
+  } = props;
 
   return (
     <Form>
@@ -24,14 +33,16 @@ export const InputForm = (props: inputWrapperProps) => {
         onChange={boxFunc}
         size={boxMaxWidth}
       />
-      <Button onClick={buttonFunc}>
-        <Icon
-          iconName={iconName}
-          iconColor="#666"
-          iconSize={24}
-          iconWeight={200}
-        />
-      </Button>
+      <ButtonTooltip tooltipContent={tooltipContents}>
+        <Button onClick={buttonFunc}>
+          <Icon
+            iconName={iconName}
+            iconColor="#666"
+            iconSize={24}
+            iconWeight={200}
+          />
+        </Button>
+      </ButtonTooltip>
     </Form>
   );
 };
@@ -65,6 +76,8 @@ const Button = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  position: relative;
 
   &:hover {
     background: #e8e8e8;

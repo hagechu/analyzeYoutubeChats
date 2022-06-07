@@ -4,31 +4,31 @@ import styled from "styled-components";
 import { Icon } from "./Icon";
 
 type SideMenuProps = {
-  isShowingMenu: boolean;
-  setIsShowingMenu: Dispatch<SetStateAction<boolean>>;
+  isOpeningMenu: boolean;
+  setIsOpeningMenu: Dispatch<SetStateAction<boolean>>;
 };
 
 export const SideMenu = (props: SideMenuProps) => {
-  const { isShowingMenu, setIsShowingMenu } = props;
+  const { isOpeningMenu, setIsOpeningMenu } = props;
 
-  const [styleBool, setStyleBool] = useState(false);
+  const [menuStyleBool, setMenuStyleBool] = useState(false);
 
   useEffect(() => {
-    if (isShowingMenu) {
-      setStyleBool(true);
+    if (isOpeningMenu) {
+      setMenuStyleBool(true);
     } else {
     }
-  }, [isShowingMenu]);
+  }, [isOpeningMenu]);
 
   const invalidateStyleBool = () => {
-    setStyleBool(false);
-    setTimeout(() => setIsShowingMenu(false), 300);
+    setMenuStyleBool(false);
+    setTimeout(() => setIsOpeningMenu(false), 300);
   };
 
   return (
-    <MenuWrapper bool={isShowingMenu}>
-      <Cover bool={styleBool} onClick={invalidateStyleBool}></Cover>
-      <Menu bool={styleBool}>
+    <MenuWrapper bool={isOpeningMenu}>
+      <Cover bool={menuStyleBool} onClick={invalidateStyleBool}></Cover>
+      <Menu bool={menuStyleBool}>
         <IconSpace>
           <MenuIcon onClick={invalidateStyleBool}>
             <Icon
@@ -75,6 +75,8 @@ export const SideMenu = (props: SideMenuProps) => {
 };
 
 const MenuWrapper = styled.div<{ bool: boolean }>`
+  z-index: 100;
+
   width: 100vw;
   height: 100vh;
   position: absolute;
@@ -96,8 +98,6 @@ const Cover = styled.div<{ bool: boolean }>`
 `;
 
 const Menu = styled.div<{ bool: boolean }>`
-  z-index: 100;
-
   width: 240px;
   height: 100%;
   position: absolute;

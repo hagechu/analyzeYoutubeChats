@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
 
+import { Header } from "./Header";
 import { Graph } from "./Graph";
-import { Icon } from "./Icon";
-import { SideMenu } from "./SideMenu";
 import { CutPerMinutesButton } from "./CutPerMinutesButton";
 import { PlayYoutubeVideo } from "./PlayYoutubeVideo";
 import { InputForm } from "./InputForm";
+import { ButtonTooltip } from "./ButtonTooltip";
 
 import { ChatPerMinute, Chat } from "../models/chatType";
 
@@ -19,7 +19,6 @@ export const GetYoutubeChats = () => {
   const [isLoading, setIsLoading] = useState(false); // リクエスト中の判別
   const [isTesting, setIsTesting] = useState(false); // test中の判別
   const [isShowingVideo, setIsShowingVideo] = useState(false); // 動画を表示するかの判別
-  const [isShowingMenu, setIsShowingMenu] = useState(false); // サイドメニューの表示判別
 
   const [flowRatePerMinutes, setFlowRatePerMinutes] = useState<ChatPerMinute[]>(
     []
@@ -223,36 +222,14 @@ export const GetYoutubeChats = () => {
   // りたーん
   return (
     <Body>
-      <Header>
-        <SideMenu
-          isShowingMenu={isShowingMenu}
-          setIsShowingMenu={setIsShowingMenu}
-        />
-        <HeaderLeft>
-          <IconSpace>
-            <MenuIcon onClick={() => setIsShowingMenu(true)}>
-              <Icon
-                iconName="Menu"
-                iconColor="#000"
-                iconSize={32}
-                iconWeight={300}
-              />
-            </MenuIcon>
-          </IconSpace>
-          <div>{isTesting ? <p>testMode</p> : <p></p>}</div>
-        </HeaderLeft>
-        <InputForm
-          placeholder={"videoID"}
-          iconName={"vertical_align_bottom"}
-          value={videoID}
-          boxMaxWidth={480}
-          boxFunc={generateVideoIDFromInput}
-          buttonFunc={postServer}
-        />
-        <HeaderRight></HeaderRight>
-      </Header>
-      <Article>
-        <div>{isLoading ? <p>分析中...</p> : <p>待機中</p>}</div>
+      <Header
+        videoID={videoID}
+        isTesting={isTesting}
+        generateVideoIDFromInput={generateVideoIDFromInput}
+        postServer={postServer}
+      />
+      <Main>
+        {/* <div>{isLoading ? <p>分析中...</p> : <p>待機中</p>}</div> */}
         <VideoSpace>
           {isShowingVideo ? (
             <PlayYoutubeVideo videoID={videoIDforPlay} startTime={startTime} />
@@ -275,8 +252,9 @@ export const GetYoutubeChats = () => {
         <ControllerWrapper>
           <ControllerWrapperRight>
             <InputForm
-              placeholder={"ワード検索"}
+              placeholder={"ワードで検索"}
               iconName={"search"}
+              tooltipContents={"ワードごとの流量を計算"}
               value={searchWord}
               boxMaxWidth={240}
               boxFunc={inputWord}
@@ -284,24 +262,30 @@ export const GetYoutubeChats = () => {
             />
           </ControllerWrapperRight>
           <ControllerWrapperLeft>
-            <CutPerMinutesButton
-              buttonFunc={() => setGraphData(flowRatePerMinutes)}
-              buttonName="1分"
-              buttonSize={16}
-            />
-            <CutPerMinutesButton
-              buttonFunc={() => setGraphData(flowRatePer5Minutes)}
-              buttonName="5分"
-              buttonSize={16}
-            />
-            <CutPerMinutesButton
-              buttonFunc={() => setGraphData(flowRatePer10Minutes)}
-              buttonName="10分"
-              buttonSize={16}
-            />
+            <ButtonTooltip tooltipContent="１分ごとのデータ">
+              <CutPerMinutesButton
+                buttonFunc={() => setGraphData(flowRatePerMinutes)}
+                buttonName="1分"
+                buttonSize={16}
+              />
+            </ButtonTooltip>
+            <ButtonTooltip tooltipContent="５分ごとのデータ">
+              <CutPerMinutesButton
+                buttonFunc={() => setGraphData(flowRatePer5Minutes)}
+                buttonName="5分"
+                buttonSize={16}
+              />
+            </ButtonTooltip>
+            <ButtonTooltip tooltipContent="１０分ごとのデータ">
+              <CutPerMinutesButton
+                buttonFunc={() => setGraphData(flowRatePer10Minutes)}
+                buttonName="10分"
+                buttonSize={16}
+              />
+            </ButtonTooltip>
           </ControllerWrapperLeft>
         </ControllerWrapper>
-      </Article>
+      </Main>
     </Body>
   );
 };
@@ -313,39 +297,7 @@ const Body = styled.div`
   background: #fafafa;
 `;
 
-const Header = styled.div`
-  height: 64px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  background: #fff;
-  box-shadow: 0px 0px 1px 0.2px #ddd;
-`;
-
-const HeaderLeft = styled.div`
-  width: 144px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const IconSpace = styled.div`
-  width: 72px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const MenuIcon = styled.button`
-  width: 24px;
-`;
-
-const HeaderRight = styled.div`
-  width: 144px;
-`;
-
-const Article = styled.article`
+const Main = styled.main`
   margin: 0 auto;
   max-width: 1000px;
   z-index: 10;
