@@ -7,6 +7,7 @@ type ModalWindowProps = {
   menuNumber: number;
   iconName: string;
   modalContent: string;
+  colorMode: boolean;
   menuListBool: boolean[];
   closeModalMenu: (index: number) => void;
   children: ReactNode;
@@ -17,6 +18,7 @@ export const ModalWindow = (props: ModalWindowProps) => {
     menuNumber,
     iconName,
     modalContent,
+    colorMode,
     menuListBool,
     closeModalMenu,
     children,
@@ -24,13 +26,14 @@ export const ModalWindow = (props: ModalWindowProps) => {
 
   return (
     <Modal>
-      <InnerModal bool={menuListBool[menuNumber]}>
-        <ModalHeader>
+      <InnerModal bool={menuListBool[menuNumber]} colorMode={colorMode}>
+        <ModalHeader colorMode={colorMode}>
           <Icon
             iconName={iconName}
-            iconColor="#333"
+            iconColor={colorMode ? "#fff" : "#333"}
             iconSize={24}
             iconWeight={300}
+            iconFill={1}
           />
           <ModalTitle>{modalContent}</ModalTitle>
         </ModalHeader>
@@ -50,7 +53,7 @@ const Modal = styled.div`
   height: 100%;
 `;
 
-const InnerModal = styled.div<{ bool: boolean }>`
+const InnerModal = styled.div<{ bool: boolean; colorMode: boolean }>`
   width: 50%;
   height: 50%;
 
@@ -61,18 +64,19 @@ const InnerModal = styled.div<{ bool: boolean }>`
   transform: translate(-50%, -50%);
 
   border-radius: 8px;
-  box-shadow: 0 0 40px 3em rgba(100, 100, 100, 0.5);
+  box-shadow: ${(props) =>
+    props.colorMode ? "none" : "0 0 40px 3em rgba(100, 100, 100, 0.5)"};
   display: ${(props) => (props.bool ? "block" : "none")};
 
-  background: #fff;
+  background: ${(props) => (props.colorMode ? "#111" : "#fff")};
 `;
 
-const ModalHeader = styled.header`
+const ModalHeader = styled.header<{ colorMode: boolean }>`
   height: 64px;
   padding: 0 32px;
-  border-bottom: solid 1px #ccc;
+  border-bottom: solid 0.5px #ccc;
   border-radius: 8px 9px 0px 0px;
-  box-shadow: 0px 1px 0.3px #ddd;
+  box-shadow: ${(props) => (props.colorMode ? "none" : "0px 1px 0.3px #ddd")};
 
   display: flex;
   align-items: center;
@@ -104,5 +108,5 @@ const ModalFooter = styled.footer`
 `;
 
 const CloseButton = styled.button`
-  color: blue;
+  color: #1e90ff;
 `;

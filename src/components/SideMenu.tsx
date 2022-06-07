@@ -54,40 +54,49 @@ export const SideMenu = (props: SideMenuProps) => {
         modalBool={isOpeningModal}
         onClick={invalidateStyleBool}
       ></Cover>
-      <Menu sideMenuBool={menuStyleBool}>
+      <Menu sideMenuBool={menuStyleBool} colorMode={colorMode}>
         <IconSpace>
           <MenuIcon onClick={invalidateStyleBool}>
             <Icon
               iconName="Menu"
-              iconColor="#000"
+              iconColor={colorMode ? "#fff" : "#000"}
               iconSize={32}
               iconWeight={300}
+              iconFill={0}
             />
           </MenuIcon>
         </IconSpace>
         <NavWrapper>
           <NavList>
             <li>
-              <NavElement onClick={() => openModalMenu(0)}>
+              <NavElement
+                colorMode={colorMode}
+                onClick={() => openModalMenu(0)}
+              >
                 <NavIcon>
                   <Icon
                     iconName="info"
-                    iconColor="#000"
+                    iconColor={colorMode ? "#fff" : "#000"}
                     iconSize={24}
                     iconWeight={300}
+                    iconFill={0}
                   />
                 </NavIcon>
                 <p>使い方</p>
               </NavElement>
             </li>
             <li>
-              <NavElement onClick={() => openModalMenu(1)}>
+              <NavElement
+                colorMode={colorMode}
+                onClick={() => openModalMenu(1)}
+              >
                 <NavIcon>
                   <Icon
                     iconName={colorMode ? "Dark_Mode" : "Light_Mode"}
-                    iconColor="#000"
+                    iconColor={colorMode ? "#fff" : "#000"}
                     iconSize={24}
                     iconWeight={300}
+                    iconFill={0}
                   />
                 </NavIcon>
                 <p>{colorMode ? "ダークテーマ" : "ライトテーマ"}</p>
@@ -101,15 +110,26 @@ export const SideMenu = (props: SideMenuProps) => {
           menuNumber={0}
           iconName="info"
           modalContent="使い方"
+          colorMode={colorMode}
           menuListBool={menuListBool}
           closeModalMenu={closeModalMenu}
         >
           <p>
             YouTubeのライブのアーカイブから、チャットの流量を分析するツールです。
+          </p>
+          <p>
             YouTubeのURL、またはURL末尾の"v="以降の11桁の文字列を画面上部のテキストボックスに入力した後に、横にあるボタンを押すと分析が始まります。
+          </p>
+          <p>
             動画の長さによって分析にかかる時間は変わります。（１２時間ほどの長い動画では１０分ほどかかる場合もあります。）
+          </p>
+          <p>
             分析が終わると、流量がグラフに表示されグラフの中の指定した時間から動画を再生することができます。
+          </p>
+          <p>
             画面左下のテキストボックスでは、入力した単語に限定した流量を調べることができます。
+          </p>
+          <p>
             また、画面右下の１分、５分、１０分のボタンを押すことで、グラフをそれぞれの時間に対応した流量の表示に変更できます。
           </p>
         </ModalWindow>
@@ -117,33 +137,43 @@ export const SideMenu = (props: SideMenuProps) => {
           menuNumber={1}
           iconName="Brightness_4"
           modalContent="カラーテーマ"
+          colorMode={colorMode}
           menuListBool={menuListBool}
           closeModalMenu={closeModalMenu}
         >
           <DropdownMenuTitle>カラーテーマを選択：</DropdownMenuTitle>
           <DropdownMenu
+            colorMode={colorMode}
             iconName={colorMode ? "Dark_Mode" : "Light_Mode"}
             dropdownName={colorMode ? "ダークテーマ" : "ライトテーマ"}
           >
             <SelectElement>
-              <SelectButton onClick={() => setColorMode(false)}>
+              <SelectButton
+                colorMode={colorMode}
+                onClick={() => setColorMode(false)}
+              >
                 <Icon
                   iconName="Light_Mode"
-                  iconColor="#000"
+                  iconColor={colorMode ? "#fff" : "#000"}
                   iconSize={24}
                   iconWeight={300}
+                  iconFill={0}
                 />
                 ライトテーマ
                 <AdjustSpace></AdjustSpace>
               </SelectButton>
             </SelectElement>
             <SelectElement>
-              <SelectButton onClick={() => setColorMode(true)}>
+              <SelectButton
+                colorMode={colorMode}
+                onClick={() => setColorMode(true)}
+              >
                 <Icon
                   iconName="Dark_Mode"
-                  iconColor="#000"
+                  iconColor={colorMode ? "#fff" : "#000"}
                   iconSize={24}
                   iconWeight={300}
+                  iconFill={0}
                 />
                 ダークテーマ
                 <AdjustSpace></AdjustSpace>
@@ -180,14 +210,15 @@ const Cover = styled.div<{ sideMenuBool: boolean; modalBool: boolean }>`
   z-index: ${(props) => (props.modalBool ? "2" : "0")};
 `;
 
-const Menu = styled.div<{ sideMenuBool: boolean }>`
+const Menu = styled.div<{ sideMenuBool: boolean; colorMode: boolean }>`
   width: 240px;
   height: 100%;
   position: absolute;
   top: 0;
   left: ${(props) => (props.sideMenuBool ? "0" : "-240px")};
-  background: #fff;
-  box-shadow: 0px 0px 1px 0.2px #ddd;
+  background: ${(props) => (props.colorMode ? "#111" : "#fff")};
+  box-shadow: ${(props) =>
+    props.colorMode ? "none" : "0px 0px 1px 0.2px #ddd"};
 
   transition: 0.3s;
 `;
@@ -213,16 +244,17 @@ const NavList = styled.ul`
   list-style: none;
 `;
 
-const NavElement = styled.button`
+const NavElement = styled.button<{ colorMode: boolean }>`
   width: 100%;
   padding: 0 24px;
   height: 48px;
   font-size: 16px;
   display: flex;
   align-items: center;
+  color: ${(props) => (props.colorMode ? "#fff" : "#000")};
 
   &:hover {
-    background: #f3f3f3;
+    background: ${(props) => (props.colorMode ? "#222" : "#f3f3f3")};
   }
 `;
 
@@ -259,7 +291,8 @@ const SelectElement = styled.li`
   border: solid 1px #ccc;
 `;
 
-const SelectButton = styled.button`
+const SelectButton = styled.button<{ colorMode: boolean }>`
+  color: ${(props) => (props.colorMode ? "#fff" : "#000")};
   width: 100%;
   height: 100%;
   padding: 0 16px;
@@ -269,7 +302,7 @@ const SelectButton = styled.button`
   align-items: center;
 
   &:hover {
-    background: #f3f3f3;
+    background: ${(props) => (props.colorMode ? "#333" : "#f3f3f3")};
   }
 `;
 

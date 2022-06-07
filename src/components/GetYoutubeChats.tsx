@@ -7,6 +7,7 @@ import { Graph } from "./Graph";
 import { CutPerMinutesButton } from "./CutPerMinutesButton";
 import { PlayYoutubeVideo } from "./PlayYoutubeVideo";
 import { InputForm } from "./InputForm";
+import { Loading } from "./Loading";
 
 import { ChatPerMinute, Chat } from "../models/chatType";
 
@@ -222,7 +223,7 @@ export const GetYoutubeChats = () => {
 
   // りたーん
   return (
-    <Body>
+    <Body colorMode={colorMode}>
       <Header
         videoID={videoID}
         isTesting={isTesting}
@@ -232,21 +233,24 @@ export const GetYoutubeChats = () => {
         postServer={postServer}
       />
       <Main>
+        <Loading colorMode={colorMode} isLoading={isLoading} />
         {/* <div>{isLoading ? <p>分析中...</p> : <p>待機中</p>}</div> */}
         <VideoWrapper>
           {isShowingVideo ? (
             <PlayYoutubeVideo videoID={videoIDforPlay} startTime={startTime} />
           ) : (
-            <TemporaryVideoSpace></TemporaryVideoSpace>
+            <TemporaryVideoSpace colorMode={colorMode}></TemporaryVideoSpace>
           )}
         </VideoWrapper>
         <Graph
+          colorMode={colorMode}
           graphData={graphData}
           dataKey="chatAmount"
           startTime={startTime}
           setStartTime={setStartTime}
         />
         <Graph
+          colorMode={colorMode}
           graphData={graphData}
           dataKey="wordAmount"
           startTime={startTime}
@@ -255,6 +259,7 @@ export const GetYoutubeChats = () => {
         <ControllerWrapper>
           <ControllerWrapperRight>
             <InputForm
+              colorMode={colorMode}
               placeholder={"ワードを入力"}
               iconName={"search"}
               tooltipContents={"ワードごとの流量を計算"}
@@ -266,16 +271,19 @@ export const GetYoutubeChats = () => {
           </ControllerWrapperRight>
           <ControllerWrapperLeft>
             <CutPerMinutesButton
+              colorMode={colorMode}
               buttonFunc={() => setGraphData(flowRatePerMinutes)}
               buttonName="1分"
               buttonSize={16}
             />
             <CutPerMinutesButton
+              colorMode={colorMode}
               buttonFunc={() => setGraphData(flowRatePer5Minutes)}
               buttonName="5分"
               buttonSize={16}
             />
             <CutPerMinutesButton
+              colorMode={colorMode}
               buttonFunc={() => setGraphData(flowRatePer10Minutes)}
               buttonName="10分"
               buttonSize={16}
@@ -288,10 +296,11 @@ export const GetYoutubeChats = () => {
 };
 
 //style
-const Body = styled.div`
+const Body = styled.div<{ colorMode: boolean }>`
   position: relative;
   height: 100vh;
-  background: #fafafa;
+  background: ${(props) => (props.colorMode ? "#111" : "#fafafa")};
+  color: ${(props) => (props.colorMode ? "#fff" : "#000")};
 `;
 
 const Main = styled.main`
@@ -313,10 +322,11 @@ const VideoWrapper = styled.section`
   align-items: center;
 `;
 
-const TemporaryVideoSpace = styled.div`
+const TemporaryVideoSpace = styled.div<{ colorMode: boolean }>`
   width: 100%;
   max-width: 640px;
-  border: 2px dotted #ccc;
+  border: ${(props) =>
+    props.colorMode ? "2px dotted #444" : "2px dotted #ccc"};
 
   aspect-ratio: 16 / 9;
 `;

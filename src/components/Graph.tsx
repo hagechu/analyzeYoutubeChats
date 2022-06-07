@@ -18,7 +18,7 @@ type rechartsType = {
 };
 
 export const Graph = (props: GraphProps) => {
-  const { graphData, dataKey, startTime, setStartTime } = props;
+  const { colorMode, graphData, dataKey, startTime, setStartTime } = props;
 
   const graphOnClick = (data: rechartsType) => {
     const judgeNumber = (data?: number) => {
@@ -45,7 +45,10 @@ export const Graph = (props: GraphProps) => {
           margin={{ top: 5, right: 56, left: 0, bottom: 5 }}
           onClick={graphOnClick}
         >
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid
+            strokeDasharray="2 2 2"
+            stroke={colorMode ? "#444" : "#ccc"}
+          />
           <XAxis dataKey="date" />
           <YAxis />
           <Tooltip />

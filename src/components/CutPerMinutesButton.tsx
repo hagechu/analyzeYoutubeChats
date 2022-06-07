@@ -5,22 +5,24 @@ import { Icon } from "./Icon";
 import { ButtonTooltip } from "./ButtonTooltip";
 
 export type cutButtonProps = {
+  colorMode: boolean;
   buttonFunc: () => void;
   buttonName: string;
   buttonSize: number;
 };
 
 export const CutPerMinutesButton = (props: cutButtonProps) => {
-  const { buttonName, buttonSize, buttonFunc } = props;
+  const { colorMode, buttonName, buttonSize, buttonFunc } = props;
 
   return (
     <ButtonTooltip tooltipContent={`${buttonName}おきのデータ`}>
-      <CutButton onClick={buttonFunc} size={buttonSize}>
+      <CutButton onClick={buttonFunc} size={buttonSize} colorMode={colorMode}>
         <Icon
           iconName="content_cut"
-          iconColor="#000"
+          iconColor={colorMode ? "#fff" : "#000"}
           iconSize={16}
           iconWeight={400}
+          iconFill={0}
         />
         <ButtonName>{buttonName}</ButtonName>
       </CutButton>
@@ -28,7 +30,8 @@ export const CutPerMinutesButton = (props: cutButtonProps) => {
   );
 };
 
-const CutButton = styled.button<{ size: number }>`
+const CutButton = styled.button<{ size: number; colorMode: boolean }>`
+  color: ${(props) => (props.colorMode ? "#fff" : "#000")};
   font-size: ${(props) => `${props.size}px`};
   height: 32px;
 

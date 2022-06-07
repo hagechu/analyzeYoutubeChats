@@ -29,7 +29,7 @@ export const Header = (props: HeaderProps) => {
   const [isOpeningMenu, setIsOpeningMenu] = useState(false); // サイドメニューの表示判別
 
   return (
-    <HeaderWrapper>
+    <HeaderWrapper colorMode={colorMode}>
       <SideMenu
         isOpeningMenu={isOpeningMenu}
         colorMode={colorMode}
@@ -41,15 +41,17 @@ export const Header = (props: HeaderProps) => {
           <MenuIcon onClick={() => setIsOpeningMenu(true)}>
             <Icon
               iconName="Menu"
-              iconColor="#000"
+              iconColor={colorMode ? "#fff" : "#000"}
               iconSize={32}
               iconWeight={300}
+              iconFill={0}
             />
           </MenuIcon>
         </IconSpace>
         <div>{isTesting ? <p>testMode</p> : <p></p>}</div>
       </HeaderLeft>
       <InputForm
+        colorMode={colorMode}
         placeholder={"videoID"}
         iconName={"vertical_align_bottom"}
         tooltipContents={"チャットを取得して解析"}
@@ -63,14 +65,15 @@ export const Header = (props: HeaderProps) => {
   );
 };
 
-const HeaderWrapper = styled.header`
+const HeaderWrapper = styled.header<{ colorMode: boolean }>`
   height: 64px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  background: #fff;
-  box-shadow: 0px 0px 1px 0.2px #ddd;
+  background: ${(props) => (props.colorMode ? "#1f1f1f" : "#fff")};
+  box-shadow: ${(props) =>
+    props.colorMode ? "none" : "0px 0px 1px 0.2px #ddd"};
 `;
 
 const HeaderLeft = styled.div`

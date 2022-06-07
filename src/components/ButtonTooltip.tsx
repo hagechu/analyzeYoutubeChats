@@ -41,7 +41,7 @@ const TooltipContent = styled.div<{ bool: boolean }>`
   font-size: 12px;
   color: #fff;
   padding: 8px;
-  background: rgba(4, 4, 4, 0.5);
+  background: rgba(4, 4, 4, 0.9);
   border-radius: 2px;
   white-space: nowrap;
 
