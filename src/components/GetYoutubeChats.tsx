@@ -7,7 +7,6 @@ import { Graph } from "./Graph";
 import { CutPerMinutesButton } from "./CutPerMinutesButton";
 import { PlayYoutubeVideo } from "./PlayYoutubeVideo";
 import { InputForm } from "./InputForm";
-import { ButtonTooltip } from "./ButtonTooltip";
 
 import { ChatPerMinute, Chat } from "../models/chatType";
 
@@ -33,6 +32,8 @@ export const GetYoutubeChats = () => {
   const [searchWord, setSearchWord] = useState(""); //グラフ内で検索するワード
   const [graphData, setGraphData] = useState<ChatPerMinute[]>([]); // グラフに描画するデータ
   const [startTime, setStartTime] = React.useState<number>(0); //グラフから動画を再生する時間を指定
+
+  const [colorMode, setColorMode] = useState(false);
 
   // URLからIDだけにする
   const generateVideoIDFromInput = (
@@ -225,18 +226,20 @@ export const GetYoutubeChats = () => {
       <Header
         videoID={videoID}
         isTesting={isTesting}
+        colorMode={colorMode}
+        setColorMode={setColorMode}
         generateVideoIDFromInput={generateVideoIDFromInput}
         postServer={postServer}
       />
       <Main>
         {/* <div>{isLoading ? <p>分析中...</p> : <p>待機中</p>}</div> */}
-        <VideoSpace>
+        <VideoWrapper>
           {isShowingVideo ? (
             <PlayYoutubeVideo videoID={videoIDforPlay} startTime={startTime} />
           ) : (
             <TemporaryVideoSpace></TemporaryVideoSpace>
           )}
-        </VideoSpace>
+        </VideoWrapper>
         <Graph
           graphData={graphData}
           dataKey="chatAmount"
@@ -252,7 +255,7 @@ export const GetYoutubeChats = () => {
         <ControllerWrapper>
           <ControllerWrapperRight>
             <InputForm
-              placeholder={"ワードで検索"}
+              placeholder={"ワードを入力"}
               iconName={"search"}
               tooltipContents={"ワードごとの流量を計算"}
               value={searchWord}
@@ -262,27 +265,21 @@ export const GetYoutubeChats = () => {
             />
           </ControllerWrapperRight>
           <ControllerWrapperLeft>
-            <ButtonTooltip tooltipContent="１分ごとのデータ">
-              <CutPerMinutesButton
-                buttonFunc={() => setGraphData(flowRatePerMinutes)}
-                buttonName="1分"
-                buttonSize={16}
-              />
-            </ButtonTooltip>
-            <ButtonTooltip tooltipContent="５分ごとのデータ">
-              <CutPerMinutesButton
-                buttonFunc={() => setGraphData(flowRatePer5Minutes)}
-                buttonName="5分"
-                buttonSize={16}
-              />
-            </ButtonTooltip>
-            <ButtonTooltip tooltipContent="１０分ごとのデータ">
-              <CutPerMinutesButton
-                buttonFunc={() => setGraphData(flowRatePer10Minutes)}
-                buttonName="10分"
-                buttonSize={16}
-              />
-            </ButtonTooltip>
+            <CutPerMinutesButton
+              buttonFunc={() => setGraphData(flowRatePerMinutes)}
+              buttonName="1分"
+              buttonSize={16}
+            />
+            <CutPerMinutesButton
+              buttonFunc={() => setGraphData(flowRatePer5Minutes)}
+              buttonName="5分"
+              buttonSize={16}
+            />
+            <CutPerMinutesButton
+              buttonFunc={() => setGraphData(flowRatePer10Minutes)}
+              buttonName="10分"
+              buttonSize={16}
+            />
           </ControllerWrapperLeft>
         </ControllerWrapper>
       </Main>
@@ -307,7 +304,7 @@ const Main = styled.main`
   justify-content: center;
 `;
 
-const VideoSpace = styled.section`
+const VideoWrapper = styled.section`
   width: 100%;
   height: 400px;
 
@@ -325,6 +322,7 @@ const TemporaryVideoSpace = styled.div`
 `;
 
 const ControllerWrapper = styled.section`
+  padding: 24px;
   display: flex;
   justify-content: space-between;
 `;

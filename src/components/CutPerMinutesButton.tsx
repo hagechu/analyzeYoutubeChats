@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 import { Icon } from "./Icon";
+import { ButtonTooltip } from "./ButtonTooltip";
 
 export type cutButtonProps = {
   buttonFunc: () => void;
@@ -13,15 +14,17 @@ export const CutPerMinutesButton = (props: cutButtonProps) => {
   const { buttonName, buttonSize, buttonFunc } = props;
 
   return (
-    <CutButton onClick={buttonFunc} size={buttonSize}>
-      <Icon
-        iconName="content_cut"
-        iconColor="#000"
-        iconSize={16}
-        iconWeight={400}
-      />
-      <ButtonName>{buttonName}</ButtonName>
-    </CutButton>
+    <ButtonTooltip tooltipContent={`${buttonName}おきのデータ`}>
+      <CutButton onClick={buttonFunc} size={buttonSize}>
+        <Icon
+          iconName="content_cut"
+          iconColor="#000"
+          iconSize={16}
+          iconWeight={400}
+        />
+        <ButtonName>{buttonName}</ButtonName>
+      </CutButton>
+    </ButtonTooltip>
   );
 };
 

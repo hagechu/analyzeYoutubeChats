@@ -21,8 +21,6 @@ export const Graph = (props: GraphProps) => {
   const { graphData, dataKey, startTime, setStartTime } = props;
 
   const graphOnClick = (data: rechartsType) => {
-    // console.log(data.activeTooltipIndex, data.activeLabel);
-
     const judgeNumber = (data?: number) => {
       if (data === undefined) {
         return 0;

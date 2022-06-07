@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Dispatch, SetStateAction } from "react";
 import styled from "styled-components";
 
 import { Icon } from "./Icon";
@@ -8,6 +8,8 @@ import { InputForm } from "./InputForm";
 type HeaderProps = {
   videoID: string;
   isTesting: boolean;
+  colorMode: boolean;
+  setColorMode: Dispatch<SetStateAction<boolean>>;
   generateVideoIDFromInput: (
     event: React.ChangeEvent<HTMLInputElement>
   ) => void;
@@ -15,7 +17,14 @@ type HeaderProps = {
 };
 
 export const Header = (props: HeaderProps) => {
-  const { videoID, isTesting, generateVideoIDFromInput, postServer } = props;
+  const {
+    videoID,
+    isTesting,
+    colorMode,
+    setColorMode,
+    generateVideoIDFromInput,
+    postServer,
+  } = props;
 
   const [isOpeningMenu, setIsOpeningMenu] = useState(false); // サイドメニューの表示判別
 
@@ -23,7 +32,9 @@ export const Header = (props: HeaderProps) => {
     <HeaderWrapper>
       <SideMenu
         isOpeningMenu={isOpeningMenu}
+        colorMode={colorMode}
         setIsOpeningMenu={setIsOpeningMenu}
+        setColorMode={setColorMode}
       />
       <HeaderLeft>
         <IconSpace>
