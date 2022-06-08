@@ -221,6 +221,13 @@ export const GetYoutubeChats = () => {
     setGraphData(chatArray);
   };
 
+  const graphDataKeyList = ["chatAmount", "wordAmount"];
+  const cutButtonList = [
+    { minute: "1分", func: flowRatePerMinutes },
+    { minute: "5分", func: flowRatePer5Minutes },
+    { minute: "10分", func: flowRatePer10Minutes },
+  ];
+
   // りたーん
   return (
     <Body colorMode={colorMode}>
@@ -242,20 +249,19 @@ export const GetYoutubeChats = () => {
             <TemporaryVideoSpace colorMode={colorMode}></TemporaryVideoSpace>
           )}
         </VideoWrapper>
-        <Graph
-          colorMode={colorMode}
-          graphData={graphData}
-          dataKey="chatAmount"
-          startTime={startTime}
-          setStartTime={setStartTime}
-        />
-        <Graph
-          colorMode={colorMode}
-          graphData={graphData}
-          dataKey="wordAmount"
-          startTime={startTime}
-          setStartTime={setStartTime}
-        />
+        <GraphWrapper>
+          {graphDataKeyList.map((dataKey) => (
+            <li>
+              <Graph
+                colorMode={colorMode}
+                graphData={graphData}
+                dataKey={dataKey}
+                startTime={startTime}
+                setStartTime={setStartTime}
+              />
+            </li>
+          ))}
+        </GraphWrapper>
         <ControllerWrapper>
           <ControllerWrapperRight>
             <InputForm
@@ -270,24 +276,16 @@ export const GetYoutubeChats = () => {
             />
           </ControllerWrapperRight>
           <ControllerWrapperLeft>
-            <CutPerMinutesButton
-              colorMode={colorMode}
-              buttonFunc={() => setGraphData(flowRatePerMinutes)}
-              buttonName="1分"
-              buttonSize={16}
-            />
-            <CutPerMinutesButton
-              colorMode={colorMode}
-              buttonFunc={() => setGraphData(flowRatePer5Minutes)}
-              buttonName="5分"
-              buttonSize={16}
-            />
-            <CutPerMinutesButton
-              colorMode={colorMode}
-              buttonFunc={() => setGraphData(flowRatePer10Minutes)}
-              buttonName="10分"
-              buttonSize={16}
-            />
+            {cutButtonList.map((buttonElement) => (
+              <li>
+                <CutPerMinutesButton
+                  colorMode={colorMode}
+                  buttonFunc={() => setGraphData(buttonElement.func)}
+                  buttonName={buttonElement.minute}
+                  buttonSize={16}
+                />
+              </li>
+            ))}
           </ControllerWrapperLeft>
         </ControllerWrapper>
       </Main>
@@ -331,6 +329,12 @@ const TemporaryVideoSpace = styled.div<{ colorMode: boolean }>`
   aspect-ratio: 16 / 9;
 `;
 
+const GraphWrapper = styled.ul`
+  width: 100%;
+  height: 100%;
+  list-style: none;
+`;
+
 const ControllerWrapper = styled.section`
   padding: 24px;
   display: flex;
@@ -341,11 +345,12 @@ const ControllerWrapperRight = styled.div`
   display: flex;
 `;
 
-const ControllerWrapperLeft = styled.div`
+const ControllerWrapperLeft = styled.ul`
   width: 240px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  list-style: none;
 `;
 
 // http://localhost:3000/

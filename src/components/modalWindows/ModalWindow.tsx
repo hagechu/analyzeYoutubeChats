@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import styled from "styled-components";
 
-import { Icon } from "./Icon";
+import { Icon } from "../Icon";
 
 type ModalWindowProps = {
   menuNumber: number;
@@ -48,7 +48,7 @@ export const ModalWindow = (props: ModalWindowProps) => {
   );
 };
 
-const Modal = styled.div`
+const Modal = styled.li`
   width: 100%;
   height: 100%;
 `;

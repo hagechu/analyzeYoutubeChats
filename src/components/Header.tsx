@@ -43,8 +43,6 @@ export const Header = (props: HeaderProps) => {
               iconName="Menu"
               iconColor={colorMode ? "#fff" : "#000"}
               iconSize={32}
-              iconWeight={300}
-              iconFill={0}
             />
           </MenuIcon>
         </IconSpace>

@@ -41,9 +41,7 @@ export const InputForm = (props: InputWrapperProps) => {
           <Icon
             iconName={iconName}
             iconColor={colorMode ? "#ddd" : "#666"}
-            iconSize={24}
             iconWeight={200}
-            iconFill={0}
           />
         </Button>
       </ButtonTooltip>

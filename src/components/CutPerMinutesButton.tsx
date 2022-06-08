@@ -21,8 +21,6 @@ export const CutPerMinutesButton = (props: cutButtonProps) => {
           iconName="content_cut"
           iconColor={colorMode ? "#fff" : "#000"}
           iconSize={16}
-          iconWeight={400}
-          iconFill={0}
         />
         <ButtonName>{buttonName}</ButtonName>
       </CutButton>

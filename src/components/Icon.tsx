@@ -4,13 +4,19 @@ import styled from "styled-components";
 type iconProps = {
   iconName: string;
   iconColor: string;
-  iconSize: number;
-  iconWeight: number;
-  iconFill: number;
+  iconSize?: number;
+  iconWeight?: number;
+  iconFill?: number;
 };
 
 export const Icon = (props: iconProps) => {
-  const { iconName, iconColor, iconSize, iconWeight, iconFill } = props;
+  const {
+    iconName,
+    iconColor,
+    iconSize = 24,
+    iconWeight = 300,
+    iconFill = 0,
+  } = props;
 
   return (
     <IconStyle

@@ -21,20 +21,11 @@ export const DropdownMenu = (props: DropdownProps) => {
         onClick={() => setIsOpeningMenu(!isOpeningMenu)}
         colorMode={colorMode}
       >
-        <Icon
-          iconName={iconName}
-          iconColor={colorMode ? "#fff" : "#000"}
-          iconSize={24}
-          iconWeight={300}
-          iconFill={0}
-        />
+        <Icon iconName={iconName} iconColor={colorMode ? "#fff" : "#000"} />
         {dropdownName}
         <Icon
           iconName="Arrow_drop_down"
           iconColor={colorMode ? "#fff" : "#000"}
-          iconSize={24}
-          iconWeight={300}
-          iconFill={0}
         />
       </DropdownButton>
       <MenuList bool={isOpeningMenu} onClick={() => setIsOpeningMenu(false)}>
